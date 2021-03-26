@@ -2,11 +2,15 @@ package data;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import Model.Contact;
 import params.Params;
@@ -35,8 +39,26 @@ public class MyDbHandler extends SQLiteOpenHelper {
         Log.d("Database log","Data added to DB");
         database.close();
     }
+    public List<Contact> getAllContact () {
+        List<Contact> listOfContact = new ArrayList<>();
+        SQLiteDatabase database = this.getReadableDatabase();
+        String select = "SELECT * FROM " + Params.TABLE_NAME;
+        Cursor cursor = database.rawQuery(select, null);
+        if (cursor.moveToFirst()) {
+            do {
+                Contact contact = new Contact();
+                contact.setId(Integer.parseInt(cursor.getString(0)));
+                contact.setName(cursor.getString(1));
+                contact.setPhoneNumber(cursor.getString(2));
+                listOfContact.add(contact);
+            }
+            while(cursor.moveToNext());
+
+        }
+        database.close();
+        return listOfContact;
+    }
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
     }
 }
